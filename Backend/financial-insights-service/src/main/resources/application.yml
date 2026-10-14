@@ -1,0 +1,46 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: financial-insights-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/finsight_insights}
+    username: ${SPRING_DATASOURCE_USERNAME:finsight_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:finsight_secure_pass_2026}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+
+finsight:
+  jwt:
+    secret: ${JWT_SECRET:4c52f78b87e21a4f89d0b51c34a2e8790123456789abcdef0123456789abcdef}
+    expiration-ms: 86400000
+    refresh-expiration-ms: 604800000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

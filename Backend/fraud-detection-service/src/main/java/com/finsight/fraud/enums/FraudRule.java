@@ -1,0 +1,10 @@
+package com.finsight.fraud.enums;
+
+public enum FraudRule {
+    HIGH_AMOUNT_ANOMALY,
+    HIGH_VELOCITY_SPIKE,
+    DUPLICATE_CANDIDATE,
+    CROSS_BORDER_ANOMALY,
+    SUSPICIOUS_ROUND_AMOUNT,
+    CONNECTED_ACCOUNTS_CYCLE
+}

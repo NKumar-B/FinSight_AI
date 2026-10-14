@@ -1,0 +1,211 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: finsight-postgres
+    environment:
+      POSTGRES_USER: finsight_user
+      POSTGRES_PASSWORD: finsight_secure_pass_2026
+      POSTGRES_DB: finsight_auth
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finsight_user -d finsight_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finsight-network
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: finsight-eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - finsight-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: finsight-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: finsight-auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_auth
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  financial-data-service:
+    build:
+      context: ./financial-data-service
+      dockerfile: Dockerfile
+    container_name: finsight-financial-data-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_financial_data
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  reconciliation-service:
+    build:
+      context: ./reconciliation-service
+      dockerfile: Dockerfile
+    container_name: finsight-reconciliation-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_reconciliation
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  fraud-detection-service:
+    build:
+      context: ./fraud-detection-service
+      dockerfile: Dockerfile
+    container_name: finsight-fraud-detection-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_fraud
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  audit-reporting-service:
+    build:
+      context: ./audit-reporting-service
+      dockerfile: Dockerfile
+    container_name: finsight-audit-reporting-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_audit
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  financial-insights-service:
+    build:
+      context: ./financial-insights-service
+      dockerfile: Dockerfile
+    container_name: finsight-financial-insights-service
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_insights
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+  ai-orchestrator-service:
+    build:
+      context: ./ai-orchestrator-service
+      dockerfile: Dockerfile
+    container_name: finsight-ai-orchestrator-service
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finsight_ai
+      SPRING_DATASOURCE_USERNAME: finsight_user
+      SPRING_DATASOURCE_PASSWORD: finsight_secure_pass_2026
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - finsight-network
+
+networks:
+  finsight-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

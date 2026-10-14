@@ -1,0 +1,30 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: reconciliation-service
+  datasource:
+    url: jdbc:h2:mem:reconciliationdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+finsight:
+  jwt:
+    secret: 4c52f78b87e21a4f89d0b51c34a2e8790123456789abcdef0123456789abcdef
+    expiration-ms: 3600000
+    refresh-expiration-ms: 86400000

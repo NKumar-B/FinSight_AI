@@ -1,0 +1,640 @@
+{
+  "info": {
+    "name": "FinSight AI - Complete Enterprise API Collection",
+    "description": "Comprehensive Postman collection for the FinSight AI microservices architecture, featuring Auth, Financial Data, Deterministic Reconciliation, Fraud Detection, Audit & Reporting, Financial Insights, and 9 Specialist AI Orchestrator Agents.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "gateway_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "run_reference",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Auth Service",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"analyst@finsight.local\",\n  \"username\": \"analyst_john\",\n  \"password\": \"SecurePass2026!\",\n  \"fullName\": \"John Doe\",\n  \"roleNames\": [\"ROLE_FINANCIAL_ANALYST\"]\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/register",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login (Auto-set JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data) {",
+                  "    pm.collectionVariables.set('jwt_token', jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', jsonData.data.refreshToken);",
+                  "    console.log('JWT Token successfully stored in collection variable');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"AdminSecure2026!\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/login",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/refresh",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/users/me",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Forgot Password (Request OTP via Email/Mobile)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"analyst@finsight.local\",\n  \"deliveryChannel\": \"EMAIL\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/forgot-password",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"analyst@finsight.local\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/verify-otp",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password with OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"analyst@finsight.local\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"NewSecurePass2026!\",\n  \"confirmPassword\": \"NewSecurePass2026!\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/reset-password",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "reset-password"]
+            }
+          }
+        },
+        {
+          "name": "Get Dynamic Role-Based Menu Access",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/auth/menu",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "auth", "menu"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Financial Data Service",
+      "item": [
+        {
+          "name": "Create Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountNumber\": \"ACC-10029384\",\n  \"accountName\": \"Primary Operating Account\",\n  \"currency\": \"USD\",\n  \"accountType\": \"CHECKING\",\n  \"currentBalance\": 500000.00\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/accounts",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "accounts"]
+            }
+          }
+        },
+        {
+          "name": "List Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/accounts?page=0&size=20",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "accounts"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ingest Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": {{account_id}},\n  \"sourceReference\": \"TXN-REF-2026-9901\",\n  \"amount\": 15250.00,\n  \"currency\": \"USD\",\n  \"type\": \"DEBIT\",\n  \"bookingDate\": \"2026-10-13T10:00:00Z\",\n  \"counterparty\": \"Cloud Infrastructure Inc\",\n  \"category\": \"SOFTWARE_SAAS\",\n  \"description\": \"Monthly Kubernetes cluster hosting\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/transactions",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "transactions"]
+            }
+          }
+        },
+        {
+          "name": "Get Unreconciled Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/transactions/unreconciled",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "transactions", "unreconciled"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Reconciliation Service",
+      "item": [
+        {
+          "name": "Execute Matching Run",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"runReference\": \"REC-RUN-20261013-01\",\n  \"accountId\": {{account_id}},\n  \"amountTolerance\": 0.05,\n  \"dateToleranceDays\": 3\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/reconciliation/runs",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "reconciliation", "runs"]
+            }
+          }
+        },
+        {
+          "name": "List Reconciliation Discrepancies",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/reconciliation/discrepancies?status=OPEN&page=0&size=20",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "reconciliation", "discrepancies"],
+              "query": [
+                { "key": "status", "value": "OPEN" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Reconciliation Review Decision",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"APPROVE_MATCH\",\n  \"comments\": \"Variance within permissible foreign exchange fee threshold\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/reconciliation/discrepancies/1/review",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "reconciliation", "discrepancies", "1", "review"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Fraud Detection Service",
+      "item": [
+        {
+          "name": "Evaluate Transaction Risk",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": 101,\n  \"accountId\": {{account_id}},\n  \"amount\": 75000.00,\n  \"currency\": \"USD\",\n  \"counterparty\": \"Offshore Holdings Corp\",\n  \"counterpartyCountry\": \"CY\",\n  \"bookingDate\": \"2026-10-13T12:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/fraud/evaluate",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "fraud", "evaluate"]
+            }
+          }
+        },
+        {
+          "name": "List Fraud Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/fraud/alerts?status=NEW&page=0&size=20",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "fraud", "alerts"],
+              "query": [
+                { "key": "status", "value": "NEW" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Alert Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"UNDER_INVESTIGATION\",\n  \"investigatorNotes\": \"Contacted treasury compliance team to verify counterparty KYC\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/fraud/alerts/1/status",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "fraud", "alerts", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Audit & Reporting Service",
+      "item": [
+        {
+          "name": "Search Audit Trail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/audit/events?action=RECONCILIATION_MATCH&page=0&size=20",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "audit", "events"],
+              "query": [
+                { "key": "action", "value": "RECONCILIATION_MATCH" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generate Compliance Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportType\": \"SOX_COMPLIANCE\",\n  \"startDate\": \"2026-10-01T00:00:00Z\",\n  \"endDate\": \"2026-10-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/audit/reports",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "audit", "reports"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Financial Insights Service",
+      "item": [
+        {
+          "name": "Create Customer Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNumber\": \"INV-2026-4401\",\n  \"customerName\": \"Acme Global Corp\",\n  \"customerEmail\": \"billing@acmeglobal.com\",\n  \"totalAmount\": 48500.00,\n  \"currency\": \"USD\",\n  \"issueDate\": \"2026-09-15\",\n  \"dueDate\": \"2026-10-15\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/insights/invoices",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "insights", "invoices"]
+            }
+          }
+        },
+        {
+          "name": "Get Accounts Receivable (AR) Aging Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/insights/invoices/ar-aging",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "insights", "invoices", "ar-aging"]
+            }
+          }
+        },
+        {
+          "name": "Get Expense Categorization Breakdown",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/insights/analytics/expenses",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "insights", "analytics", "expenses"]
+            }
+          }
+        },
+        {
+          "name": "Generate Cash Flow Runway Forecast",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"days\": 30\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/insights/analytics/cash-flow/forecast",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "insights", "analytics", "cash-flow", "forecast"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. AI Orchestrator Service",
+      "item": [
+        {
+          "name": "List 9 Specialist AI Agents",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/ai/agents",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "ai", "agents"]
+            }
+          }
+        },
+        {
+          "name": "List Registered Microservice Tools",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/ai/tools",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "ai", "tools"]
+            }
+          }
+        },
+        {
+          "name": "Execute Supervisory Meta-Orchestrator Prompt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data) {",
+                  "    pm.collectionVariables.set('run_reference', jsonData.data.runReference);",
+                  "    console.log('Stored run_reference: ' + jsonData.data.runReference);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Synthesize our cash-flow trajectory and identify top expense reduction targets\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/ai/execute",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "ai", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Execute Prompt Triggering Human Approval Gate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data) {",
+                  "    pm.collectionVariables.set('run_reference', jsonData.data.runReference);",
+                  "    console.log('Gated run_reference: ' + jsonData.data.runReference);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agentType\": \"RECONCILIATION_SPECIALIST\",\n  \"prompt\": \"Approve write-off for outstanding unresolved discrepancy balance\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/ai/execute",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "ai", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Submit Human Approval Decision",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved\": true,\n  \"reviewNotes\": \"Approved by Head of Treasury after reviewing invoice variance documentation.\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/ai/runs/{{run_reference}}/review",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "ai", "runs", "{{run_reference}}", "review"]
+            }
+          }
+        },
+        {
+          "name": "Get Agent Run Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+            ],
+            "url": {
+              "raw": "{{gateway_url}}/api/v1/ai/runs/{{run_reference}}",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "v1", "ai", "runs", "{{run_reference}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+      routes:
+        # Auth Service Routes (Registration, Login, User Management)
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth/**, /api/v1/users/**
+
+        # Financial Data Service Routes
+        - id: financial-data-service
+          uri: lb://financial-data-service
+          predicates:
+            - Path=/api/v1/financial/**, /api/v1/accounts/**, /api/v1/transactions/**
+
+        # Reconciliation Service Routes
+        - id: reconciliation-service
+          uri: lb://reconciliation-service
+          predicates:
+            - Path=/api/v1/reconciliation/**
+
+        # Fraud Detection Service Routes
+        - id: fraud-detection-service
+          uri: lb://fraud-detection-service
+          predicates:
+            - Path=/api/v1/fraud/**
+
+        # Audit and Reporting Service Routes
+        - id: audit-reporting-service
+          uri: lb://audit-reporting-service
+          predicates:
+            - Path=/api/v1/audit/**, /api/v1/reports/**
+
+        # Financial Insights Service Routes
+        - id: financial-insights-service
+          uri: lb://financial-insights-service
+          predicates:
+            - Path=/api/v1/insights/**, /api/v1/expenses/**, /api/v1/invoices/**, /api/v1/forecasts/**
+
+        # AI Orchestrator Service Routes
+        - id: ai-orchestrator-service
+          uri: lb://ai-orchestrator-service
+          predicates:
+            - Path=/api/v1/ai/**, /api/v1/agents/**
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics

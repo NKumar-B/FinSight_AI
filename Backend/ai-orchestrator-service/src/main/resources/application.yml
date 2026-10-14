@@ -1,0 +1,55 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: ai-orchestrator-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/finsight_ai}
+    username: ${SPRING_DATASOURCE_USERNAME:finsight_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:finsight_secure_pass_2026}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+finsight:
+  jwt:
+    secret: ${FINSIGHT_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    expiration-ms: ${FINSIGHT_JWT_EXPIRATION_MS:86400000}
+    refresh-expiration-ms: ${FINSIGHT_JWT_REFRESH_EXPIRATION_MS:604800000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
