@@ -9,7 +9,13 @@ export interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
   const { isAuthenticated, hasRole } = useAuth();
 
-  if (!isAuthenticated) {
+  // Evaluate both in-memory React state and synchronous localStorage fallback to eliminate navigation race conditions
+  const hasValidSession = Boolean(
+    isAuthenticated ||
+    (localStorage.getItem('finsight_jwt') && localStorage.getItem('finsight_user'))
+  );
+
+  if (!hasValidSession) {
     return <Navigate to="/login" replace />;
   }
 

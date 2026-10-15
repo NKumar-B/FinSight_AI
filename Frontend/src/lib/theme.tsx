@@ -75,6 +75,14 @@ interface ThemeContextType {
   accent: AccentTheme;
   setAccent: (accent: AccentTheme) => void;
   availableAccents: AccentTheme[];
+  appName: string;
+  setAppName: (name: string) => void;
+  appTagline: string;
+  setAppTagline: (tagline: string) => void;
+  currency: string;
+  currencySymbol: string;
+  setCurrency: (currency: string) => void;
+  resetToDefaults: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -90,6 +98,39 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const match = ACCENT_THEMES.find((a) => a.id === savedId);
     return match || ACCENT_THEMES[0];
   });
+
+  const [appName, setAppNameState] = useState<string>(() => {
+    return localStorage.getItem('finsight_app_name') || 'FinSight AI';
+  });
+
+  const [appTagline, setAppTaglineState] = useState<string>(() => {
+    return (
+      localStorage.getItem('finsight_app_tagline') ||
+      'Enterprise Multi-Agent Financial Intelligence & Fraud Surveillance'
+    );
+  });
+
+  const [currency, setCurrencyState] = useState<string>(() => {
+    return localStorage.getItem('finsight_currency') || 'USD';
+  });
+
+  const currencySymbol = (() => {
+    switch (currency.toUpperCase()) {
+      case 'INR':
+        return '₹';
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      case 'SGD':
+        return 'S$';
+      case 'JPY':
+        return '¥';
+      case 'USD':
+      default:
+        return '$';
+    }
+  })();
 
   const applyAccentCssVariables = (targetAccent: AccentTheme) => {
     const root = document.documentElement;
@@ -114,12 +155,54 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('finsight_accent_theme', accent.id);
   }, [accent]);
 
+  useEffect(() => {
+    localStorage.setItem('finsight_app_name', appName);
+    document.title = `${appName} — ${appTagline}`;
+  }, [appName, appTagline]);
+
+  useEffect(() => {
+    localStorage.setItem('finsight_app_tagline', appTagline);
+  }, [appTagline]);
+
+  useEffect(() => {
+    localStorage.setItem('finsight_currency', currency);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('finsight_currency_updated', { detail: { currency } }));
+    }
+  }, [currency]);
+
   const toggleTheme = () => {
     setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   const setAccent = (newAccent: AccentTheme) => {
     setAccentState(newAccent);
+  };
+
+  const setAppName = (name: string) => {
+    setAppNameState(name);
+  };
+
+  const setAppTagline = (tagline: string) => {
+    setAppTaglineState(tagline);
+  };
+
+  const setCurrency = (cur: string) => {
+    setCurrencyState(cur);
+    localStorage.setItem('finsight_currency', cur);
+  };
+
+  const resetToDefaults = () => {
+    setMode('light');
+    setAccentState(ACCENT_THEMES[0]);
+    setAppNameState('FinSight AI');
+    setAppTaglineState('Enterprise Multi-Agent Financial Intelligence & Fraud Surveillance');
+    setCurrencyState('USD');
+    localStorage.removeItem('finsight_theme_mode');
+    localStorage.removeItem('finsight_accent_theme');
+    localStorage.removeItem('finsight_app_name');
+    localStorage.removeItem('finsight_app_tagline');
+    localStorage.removeItem('finsight_currency');
   };
 
   return (
@@ -130,6 +213,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         accent,
         setAccent,
         availableAccents: ACCENT_THEMES,
+        appName,
+        setAppName,
+        appTagline,
+        setAppTagline,
+        currency,
+        currencySymbol,
+        setCurrency,
+        resetToDefaults,
       }}
     >
       {children}

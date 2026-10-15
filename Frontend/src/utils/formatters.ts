@@ -5,16 +5,46 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number, currency = 'USD'): string {
+export function getCurrencySymbol(currency?: string): string {
+  const code = (
+    currency ||
+    (typeof window !== 'undefined' ? localStorage.getItem('finsight_currency') || 'USD' : 'USD')
+  ).toUpperCase();
+
+  switch (code) {
+    case 'INR':
+      return '₹';
+    case 'EUR':
+      return '€';
+    case 'GBP':
+      return '£';
+    case 'SGD':
+      return 'S$';
+    case 'JPY':
+      return '¥';
+    case 'USD':
+    default:
+      return '$';
+  }
+}
+
+export function formatCurrency(amount: number, currency?: string): string {
+  const activeCurrency = (
+    currency ||
+    (typeof window !== 'undefined' ? localStorage.getItem('finsight_currency') || 'USD' : 'USD')
+  ).toUpperCase();
+
   try {
-    return new Intl.NumberFormat('en-US', {
+    const locale = activeCurrency === 'INR' ? 'en-IN' : 'en-US';
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currency || 'USD',
+      currency: activeCurrency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
   } catch {
-    return `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const symbol = getCurrencySymbol(activeCurrency);
+    return `${symbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 }
 

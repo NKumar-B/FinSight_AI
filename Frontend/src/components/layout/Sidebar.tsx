@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
+import { useTheme } from '@/lib/theme';
 import { cn } from '@/utils/formatters';
 
 interface NavItem {
@@ -47,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user, hasRole } = useAuth();
   const { t } = useI18n();
+  const { appName } = useTheme();
 
   const navigationSections: NavSection[] = [
     {
@@ -186,11 +188,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
               <Layers className="w-5 h-5 text-white" />
             </div>
             {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="font-bold text-base tracking-tight text-white flex items-center gap-1.5">
-                  FinSight <span className="text-brand-400 font-extrabold text-xs px-1.5 py-0.5 rounded bg-brand-500/20 border border-brand-500/30">AI</span>
+              <div className="flex flex-col min-w-0">
+                <span className="font-bold text-base tracking-tight text-white flex items-center gap-1.5 truncate">
+                  {appName}
                 </span>
-                <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+                <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold truncate">
                   Enterprise Fintech
                 </span>
               </div>
@@ -233,15 +235,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
                       onClick={onCloseMobile}
                       className={({ isActive }) =>
                         cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group relative',
+                          'flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group relative',
                           isActive
-                            ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/30 font-semibold'
-                            : 'text-slate-300 hover:text-white hover:bg-navy-800/80'
+                            ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-lg shadow-brand-500/30 font-semibold'
+                            : 'text-slate-300 hover:text-white hover:bg-navy-800/70 hover:translate-x-1'
                         )
                       }
                       title={isCollapsed ? item.title : undefined}
                     >
-                      <Icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                      <Icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110 duration-200" />
                       {!isCollapsed && (
                         <span className="flex-1 truncate">{item.title}</span>
                       )}

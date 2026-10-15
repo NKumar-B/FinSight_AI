@@ -505,18 +505,60 @@ def generate_documentation():
     )
 
     # -------------------------------------------------------------
-    # 6. MIDDLEWARE & DISTRIBUTED INFRASTRUCTURE
+    # 6. MIDDLEWARE & API INTEGRATION BFF LAYER
     # -------------------------------------------------------------
-    h1 = doc.add_heading("6. Middleware & Distributed Infrastructure", level=1)
+    h1 = doc.add_heading("6. Middleware Architecture & Frontend-to-Backend API Integration", level=1)
     h1.paragraph_format.space_before = Pt(14)
     h1.paragraph_format.space_after = Pt(6)
     
     doc.add_paragraph(
-        "The Middleware/ layer coordinates distributed messaging, performance optimization, and edge security:"
+        "The Middleware/ layer functions as the high-throughput Backend-For-Frontend (BFF), API mediation gateway, "
+        "distributed caching fabric, and event broker for the FinSight AI platform. Implemented in TypeScript and Express, "
+        "it operates on port 5000, mediating all frontend HTTP requests, enforcing sliding-window rate limiting, propagating "
+        "distributed correlation IDs (X-Correlation-ID), providing Redis caching, and proxying requests to the Spring Boot microservices."
     )
-    doc.add_paragraph("1. Distributed Event Streaming (Apache Kafka / RabbitMQ): Topics defined for financial.transactions, fraud.alerts, and audit.events decouple synchronous ingestion from asynchronous anomaly evaluation and ledger reconciliation.")
-    doc.add_paragraph("2. Distributed Caching (Redis 7.x): Manages high-throughput JWT token revocation blacklists upon logout, rapid 5-minute TTL expirations for 2FA OTP tokens, and rolling-window fraud velocity counters.")
-    doc.add_paragraph("3. Edge Ingress & Reverse Proxy (NGINX / Envoy): Terminates TLS 1.3, applies rate limiting to prevent brute-force credential stuffing, and standardizes CORS headers across environments.")
+
+    doc.add_paragraph(
+        "The table below details the integration between every Frontend user interface feature, the corresponding Middleware BFF route, "
+        "the underlying Spring Boot domain microservice, and the architectural operations performed:"
+    )
+
+    mw_headers = ["Frontend UI Feature", "Middleware BFF Route", "Target Spring Boot Microservice", "Core Middleware Architectural Operations"]
+    mw_data = [
+        ["Login & Register", "POST /api/v1/auth/login\nPOST /api/v1/auth/register", "auth-service (:8081)\nor Gateway (:8080)", "Validates credentials, assigns enterprise role, issues ChaCha20 OTP challenge, logs audit event."],
+        ["2FA OTP Verification", "POST /api/v1/auth/otp/verify\nPOST /api/v1/auth/otp/dispatch", "auth-service (:8081)", "Validates 6-digit OTP against Redis cache (TTL: 5m); authorizes JWT session. Fast-fill code: 834912."],
+        ["Role-Aware Navigation", "GET /api/v1/auth/menu", "auth-service (:8081)", "Filters navigation menu dynamically based on JWT authorities (Admin, Analyst, Compliance, Auditor)."],
+        ["Dashboard Analytics", "GET /api/v1/dashboard/summary", "BFF Composite Aggregation (:8082, :8083, :8084, :8087)", "Combines treasury liquidity, volume trends, risk matrix, expense donut, and agent telemetry in one fast round-trip."],
+        ["Accounts & Balances", "GET /api/v1/accounts\nPOST /api/v1/accounts", "financial-data-service (:8082)", "Manages multi-currency accounts; caches list in Redis (TTL: 60s); invalidates cache upon account creation."],
+        ["Transaction Ingestion", "POST /api/v1/transactions/ingest\nGET /api/v1/transactions", "financial-data-service (:8082)", "Calculates SHA-256 idempotency key to prevent duplicates; broadcasts financial.transactions to event broker."],
+        ["Reconciliation Runs", "POST /api/v1/reconciliation/runs\nGET /api/v1/reconciliation/runs", "reconciliation-service (:8083)", "Executes 4-step deterministic matching; publishes reconciliation.events to Kafka broker topic."],
+        ["Discrepancy Review", "POST /api/v1/reconciliation/review\nGET /api/v1/reconciliation/discrepancies", "reconciliation-service (:8083)", "Records reviewer decisions (APPROVE_MATCH, REJECT, WRITE_OFF); logs immutable audit mutation."],
+        ["Fraud Alerts & AML", "GET /api/v1/fraud/alerts\nPOST /api/v1/fraud/evaluate", "fraud-detection-service (:8084)", "Evaluates multi-factor risk score (0-100) across velocity, cross-border, and structuring rules; publishes fraud.alerts."],
+        ["Investigations & Evidence", "GET /api/v1/investigations\nGET /api/v1/investigations/:id/evidence", "fraud-detection-service (:8084)", "Fetches case files, SWIFT MT103 wire logs, rule scorecards, and AI entity graph risk evidence."],
+        ["AI Copilot & Execution", "POST /api/v1/ai/execute", "ai-orchestrator-service (:8087)", "Decomposes user prompts, routes to 9 domain agents, invokes OpenFeign tools, and handles human review gates."],
+        ["AI Specialist Agents", "GET /api/v1/ai/agents\nPOST /api/v1/ai/runs/:id/review", "ai-orchestrator-service (:8087)", "Fetches fleet telemetry; executes human-in-the-loop review decisions (APPROVE/REJECT) for high-impact actions."],
+        ["Invoices & AR Aging", "GET /api/v1/insights/invoices\nGET /api/v1/insights/aging", "financial-insights-service (:8086)", "Calculates aging tranches (0-30, 31-60, 61-90, 90+ days) and vendor concentration intelligence."],
+        ["Cash-Flow Forecasting", "GET /api/v1/insights/analytics/cash-flow", "financial-insights-service (:8086)", "Provides 30/60/90-day predictive runway modeling with statistical confidence bands."],
+        ["Audit Trail & Reports", "GET /api/v1/audit/events\nPOST /api/v1/audit/reports", "audit-reporting-service (:8085)", "Retrieves immutable audit entries with actor attribution, before/after JSON states, and SOX export reports."],
+        ["Banking Webhooks", "POST /api/v1/webhooks/banking\nPOST /api/v1/webhooks/payment-gateway", "Middleware Webhooks Adapter", "Ingests external core banking and payment gateway callbacks and enqueues to Kafka topics."]
+    ]
+    add_styled_table(doc, mw_headers, mw_data, [Inches(1.5), Inches(1.8), Inches(1.6), Inches(2.1)])
+
+    add_callout(
+        doc,
+        "Resilient Fallback Gateway: When the Spring Boot microservices are running, the Middleware proxies directly to them. "
+        "If any microservice is temporarily stopped or undergoing maintenance, the Middleware BackendClient automatically serves "
+        "high-fidelity enterprise fallback fixtures, ensuring zero frontend downtime and seamless offline evaluation.",
+        title="BFF High Availability Architecture",
+        border_color="059669",
+        bg_color="ECFDF5"
+    )
+
+    doc.add_paragraph("Key Infrastructure Configurations:")
+    doc.add_paragraph("1. Distributed Event Streaming (Apache Kafka & RabbitMQ): Configured in Middleware/event-broker/topics.json with 5 specialized topic schemas: financial.transactions, fraud.alerts, reconciliation.events, ai.agent.telemetry, and audit.events.")
+    doc.add_paragraph("2. Distributed Caching (Redis 7.x): Configured in Middleware/caching/redis.conf with LRU eviction, AOF persistence, 5-minute TTL for 2FA OTP tokens, 24-hour TTL for SHA-256 idempotency keys, and 60-second caching for read-heavy accounts.")
+    doc.add_paragraph("3. Edge Ingress & Reverse Proxy (NGINX): Configured in Middleware/reverse-proxy/nginx.conf with SSL termination, dual rate-limiting zones (50r/s API, 5r/s Auth), Gzip compression, and microservices reverse routing.")
+
 
     # -------------------------------------------------------------
     # 7. TESTING, VERIFICATION & QUALITY ASSURANCE

@@ -14,7 +14,7 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('finsight_jwt');
-    if (token && config.headers) {
+    if (token && token !== 'undefined' && token !== 'null' && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -45,12 +45,14 @@ apiClient.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return apiClient(originalRequest);
           }
-        } catch {
-          // Refresh failed - purge and let user log in again
-          localStorage.removeItem('finsight_jwt');
-          localStorage.removeItem('finsight_refresh_token');
-          localStorage.removeItem('finsight_user');
-          window.dispatchEvent(new Event('auth:expired'));
+        } catch (refreshErr: any) {
+          // Only purge and force login if the refresh endpoint explicitly rejected the token
+          if (refreshErr?.response?.status === 401 || refreshErr?.response?.status === 403) {
+            localStorage.removeItem('finsight_jwt');
+            localStorage.removeItem('finsight_refresh_token');
+            localStorage.removeItem('finsight_user');
+            window.dispatchEvent(new Event('auth:expired'));
+          }
         }
       }
     }

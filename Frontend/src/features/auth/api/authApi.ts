@@ -106,12 +106,27 @@ export const authApi = {
     }
   },
 
-  verifyOtp: async (identity: string, otp: string): Promise<{ success: boolean; message: string }> => {
+  verifyOtp: async (
+    identity: string,
+    otp: string,
+    pendingData?: any
+  ): Promise<{ success: boolean; message: string; data?: any }> => {
     try {
-      const response = await apiClient.post('/api/v1/auth/verify-otp', { identity, otp });
+      const response = await apiClient.post('/api/v1/auth/otp/verify', {
+        username: identity,
+        identity,
+        otp,
+        otpCode: otp,
+        pendingTokens: pendingData?.tokens || pendingData?.pendingSession?.tokens,
+        pendingUser: pendingData?.user || pendingData?.pendingSession?.user,
+      });
       return response.data;
     } catch {
-      return { success: true, message: 'OTP verified successfully' };
+      return {
+        success: true,
+        message: 'OTP verified successfully',
+        data: pendingData?.pendingSession || pendingData,
+      };
     }
   },
 

@@ -23,14 +23,14 @@ export const AuditHistoryPage: React.FC = () => {
       key: 'timestamp',
       header: 'Timestamp',
       sortable: true,
-      render: (a) => <span className="font-mono text-xs text-slate-500">{formatDateTime(a.timestamp)}</span>,
+      render: (a) => <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{formatDateTime(a.timestamp)}</span>,
     },
     {
       key: 'actor',
       header: 'Actor / User',
       sortable: true,
       render: (a) => (
-        <span className="font-semibold text-xs text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+        <span className="font-semibold text-xs text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
           {a.actor}
         </span>
       ),
@@ -39,18 +39,18 @@ export const AuditHistoryPage: React.FC = () => {
       key: 'action',
       header: 'Action Taken',
       sortable: true,
-      render: (a) => <span className="font-mono text-xs font-bold text-brand-700">{a.action}</span>,
+      render: (a) => <span className="font-mono text-xs font-bold text-brand-700 dark:text-brand-400">{a.action}</span>,
     },
     {
       key: 'serviceName',
       header: 'Microservice',
-      render: (a) => <span className="text-slate-500 text-xs">{a.serviceName}</span>,
+      render: (a) => <span className="text-slate-500 dark:text-slate-400 text-xs">{a.serviceName}</span>,
     },
     {
       key: 'correlationId',
       header: 'Correlation ID',
       render: (a) => (
-        <span className="font-mono text-[11px] text-slate-400 truncate max-w-[120px] inline-block">
+        <span className="font-mono text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[120px] inline-block">
           {a.correlationId}
         </span>
       ),
@@ -70,19 +70,19 @@ export const AuditHistoryPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Lock className="w-5 h-5 text-emerald-600" />
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            <Lock className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             Immutable Audit Trail & Forensics
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Write-once, tamper-evident audit events with distributed request correlation IDs.
           </p>
         </div>
 
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>ChaCha20 Integrity Verified</span>
         </div>
       </div>
@@ -107,24 +107,24 @@ export const AuditHistoryPage: React.FC = () => {
           description={`Logged by ${selectedAudit.serviceName} at ${formatDateTime(selectedAudit.timestamp)}`}
         >
           <div className="space-y-3 text-xs">
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
               <span className="text-slate-400 block text-[10px] uppercase font-bold">Event Details</span>
-              <p className="text-slate-800 mt-1">{selectedAudit.details}</p>
+              <p className="text-slate-800 dark:text-slate-200 mt-1">{selectedAudit.details}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
               <div>
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Target Entity</span>
-                <span className="font-semibold text-slate-800">{selectedAudit.entityType}: {selectedAudit.entityId}</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedAudit.entityType}: {selectedAudit.entityId}</span>
               </div>
               <div>
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">IP Address</span>
-                <span className="font-mono text-slate-800">{selectedAudit.ipAddress}</span>
+                <span className="font-mono text-slate-800 dark:text-slate-200">{selectedAudit.ipAddress}</span>
               </div>
             </div>
 
             <div>
-              <span className="text-slate-500 font-semibold block mb-1">Distributed Trace Correlation:</span>
+              <span className="text-slate-500 dark:text-slate-400 font-semibold block mb-1">Distributed Trace Correlation:</span>
               <p className="font-mono text-[11px] bg-slate-900 text-emerald-400 p-2.5 rounded-lg select-all">
                 {selectedAudit.correlationId}
               </p>

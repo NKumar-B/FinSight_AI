@@ -1,0 +1,36 @@
+{
+  "name": "finsight-middleware",
+  "version": "1.0.0",
+  "description": "FinSight AI - Distributed Middleware, API Mediation BFF & Event Streaming Layer",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "test": "node --test"
+  },
+  "keywords": [
+    "middleware",
+    "bff",
+    "api-gateway",
+    "event-broker",
+    "redis",
+    "kafka",
+    "fintech"
+  ],
+  "author": "Techurate Internship - FinSight AI Team",
+  "license": "Proprietary",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

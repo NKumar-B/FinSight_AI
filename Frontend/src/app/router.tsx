@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { LandingPage } from '@/features/landing/pages/LandingPage';
 import { UnauthorizedPage, NotFoundPage } from '@/features/auth/pages/UnauthorizedPage';
 
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
@@ -22,13 +23,14 @@ import { UserManagementPage } from '@/features/user-management/pages/UserManagem
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public Route */}
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
 
       {/* Protected Routes wrapped in AppShell */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/financial-data" element={<FinancialDataPage />} />
           <Route path="/reconciliation" element={<ReconciliationPage />} />

@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  finsight-redis:
+    image: redis:7.2-alpine
+    container_name: finsight-redis
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./caching/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - finsight-middleware-network
+
+  finsight-middleware-bff:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finsight-middleware-bff
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      REDIS_HOST: finsight-redis
+      REDIS_PORT: 6379
+      BACKEND_GATEWAY_URL: http://host.docker.internal:8080
+      FINSIGHT_JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    depends_on:
+      - finsight-redis
+    restart: unless-stopped
+    networks:
+      - finsight-middleware-network
+
+  finsight-nginx:
+    image: nginx:alpine
+    container_name: finsight-nginx-proxy
+    volumes:
+      - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - finsight-middleware-bff
+    restart: always
+    networks:
+      - finsight-middleware-network
+
+volumes:
+  redis_data:
+
+networks:
+  finsight-middleware-network:
+    name: finsight-middleware-net
+    driver: bridge

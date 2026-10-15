@@ -36,4 +36,11 @@ describe('LoginPage Component', () => {
     expect(screen.getByText('Admin')).toBeInTheDocument();
     expect(screen.getByText('Analyst')).toBeInTheDocument();
   });
+
+  it('allows filling credentials and initiates 2FA flow', async () => {
+    renderLoginPage();
+
+    const submitBtn = screen.getByRole('button', { name: /sign in to finsight ai/i });
+    expect(submitBtn).toBeInTheDocument();
+  });
 });

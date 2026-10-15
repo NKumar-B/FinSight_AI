@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   DollarSign,
+  IndianRupee,
+  Euro,
+  PoundSterling,
   GitCompare,
   ShieldAlert,
   AlertOctagon,
@@ -31,9 +34,9 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { AdminThemeCustomizerCard } from '@/components/admin/AdminThemeCustomizerCard';
 import { finSightApi } from '@/services/api/finSightApi';
-import { formatCurrency, formatDateTime } from '@/utils/formatters';
+import { formatCurrency, formatDateTime, getCurrencySymbol } from '@/utils/formatters';
+import { useTheme } from '@/lib/theme';
 
 const VOLUME_DATA = [
   { day: 'Mon', volume: 420000, reconciled: 418000 },
@@ -60,6 +63,8 @@ const EXPENSE_CATEGORIES = [
 ];
 
 export const DashboardPage: React.FC = () => {
+  const { mode, currency, currencySymbol } = useTheme();
+
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
     queryFn: finSightApi.getAccounts,
@@ -87,12 +92,12 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner / Hero */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
             Financial Intelligence Dashboard
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Real-time multi-agent telemetry, ledger reconciliation, and fraud monitoring.
           </p>
         </div>
@@ -111,26 +116,31 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Live Dynamic Theme Customizer Card */}
-      <AdminThemeCustomizerCard />
-
       {/* KPI Cards Grid (8 Core Operational Metrics) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total Operating Liquidity */}
-        <Card className="hover:shadow-elevated transition-shadow">
+        <Card className="hover:shadow-elevated transition-all glow-hover-emerald">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Treasury Liquidity
             </span>
-            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
-              <DollarSign className="w-4 h-4" />
+            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold text-sm w-8 h-8 flex items-center justify-center">
+              {currency === 'INR' ? (
+                <IndianRupee className="w-4 h-4" />
+              ) : currency === 'EUR' ? (
+                <Euro className="w-4 h-4" />
+              ) : currency === 'GBP' ? (
+                <PoundSterling className="w-4 h-4" />
+              ) : (
+                <DollarSign className="w-4 h-4" />
+              )}
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-xl font-bold text-slate-900 table-cell-num">
-              {formatCurrency(totalLiquidity)}
+            <div className="text-xl font-bold text-slate-900 dark:text-white table-cell-num">
+              {formatCurrency(totalLiquidity, currency)}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-emerald-600 mt-1 font-medium">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+8.4% vs last month</span>
             </div>
@@ -138,38 +148,38 @@ export const DashboardPage: React.FC = () => {
         </Card>
 
         {/* Card 2: Reconciliation Match Rate */}
-        <Card className="hover:shadow-elevated transition-shadow">
+        <Card className="hover:shadow-elevated transition-all glow-hover-brand">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Recon Match Rate
             </span>
-            <div className="p-2 rounded-lg bg-brand-50 text-brand-600">
+            <div className="p-2 rounded-lg bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400">
               <GitCompare className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-xl font-bold text-slate-900 table-cell-num">
+            <div className="text-xl font-bold text-slate-900 dark:text-white table-cell-num">
               {latestRecon ? `${latestRecon.matchRatePercentage}%` : '99.51%'}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               <span>{latestRecon?.unmatchedRecords || 12} discrepancies flagged</span>
             </div>
           </div>
         </Card>
 
         {/* Card 3: Active Fraud & AML Alerts */}
-        <Card className="hover:shadow-elevated transition-shadow">
+        <Card className="hover:shadow-elevated transition-all glow-hover-rose">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               AML & Fraud Alerts
             </span>
-            <div className="p-2 rounded-lg bg-rose-50 text-rose-600">
+            <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
               <ShieldAlert className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <span>{alerts?.length || 2} Open</span>
               {criticalAlertsCount > 0 && (
                 <Badge variant="danger" size="sm">
@@ -177,7 +187,7 @@ export const DashboardPage: React.FC = () => {
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-rose-600 mt-1 font-medium">
+            <div className="flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 mt-1 font-medium">
               <AlertOctagon className="w-3.5 h-3.5" />
               <span>1 Wire flagged in Grey List</span>
             </div>
@@ -185,21 +195,21 @@ export const DashboardPage: React.FC = () => {
         </Card>
 
         {/* Card 4: AI Specialist Multi-Agent Fleet */}
-        <Card className="hover:shadow-elevated transition-shadow">
+        <Card className="hover:shadow-elevated transition-all glow-hover-indigo">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               AI Multi-Agent Fleet
             </span>
-            <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+            <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
               <Bot className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <span>9 / 9 Active</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
             </div>
-            <div className="text-xs text-slate-500 mt-1">
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Central Orchestrator online
             </div>
           </div>
@@ -227,17 +237,38 @@ export const DashboardPage: React.FC = () => {
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="day" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={mode === 'dark' ? '#334155' : '#f1f5f9'} />
+                <XAxis dataKey="day" stroke={mode === 'dark' ? '#94a3b8' : '#64748b'} fontSize={11} tickLine={false} />
                 <YAxis
-                  stroke="#94a3b8"
+                  stroke={mode === 'dark' ? '#94a3b8' : '#64748b'}
                   fontSize={11}
                   tickLine={false}
-                  tickFormatter={(val) => `$${val / 1000}k`}
+                  tickFormatter={(val) => `${currencySymbol}${val / 1000}k`}
                 />
                 <Tooltip
-                  formatter={(val: any) => formatCurrency(Number(val))}
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#fff', fontSize: '11px' }}
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload || !payload.length) return null;
+                    return (
+                      <div className="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 shadow-2xl text-white pointer-events-none">
+                        <div className="font-bold text-[11px] uppercase tracking-wider text-slate-400 mb-1.5">
+                          {label}
+                        </div>
+                        <div className="space-y-1">
+                          {payload.map((entry: any) => (
+                            <div key={entry.name} className="flex items-center justify-between gap-4 text-xs">
+                              <span className="flex items-center gap-1.5 text-slate-200">
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                {entry.name}:
+                              </span>
+                              <span className="font-bold font-mono text-white">
+                                {formatCurrency(Number(entry.value), currency)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }}
                 />
                 <Area
                   type="monotone"
@@ -270,11 +301,30 @@ export const DashboardPage: React.FC = () => {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={FRAUD_SEVERITY_DATA}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={mode === 'dark' ? '#334155' : '#f1f5f9'} />
+                <XAxis dataKey="name" stroke={mode === 'dark' ? '#94a3b8' : '#64748b'} fontSize={11} tickLine={false} />
+                <YAxis stroke={mode === 'dark' ? '#94a3b8' : '#64748b'} fontSize={11} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#fff', fontSize: '11px' }}
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload || !payload.length) return null;
+                    const entry = payload[0];
+                    return (
+                      <div className="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 shadow-2xl text-white pointer-events-none">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ backgroundColor: entry.payload?.fill || entry.color }}
+                          />
+                          <span className="font-bold text-xs text-slate-100">
+                            {label || entry.name} Severity
+                          </span>
+                        </div>
+                        <div className="text-sm font-extrabold text-white font-mono">
+                          {entry.value} Active Alert{entry.value === 1 ? '' : 's'}
+                        </div>
+                      </div>
+                    );
+                  }}
                 />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                   {FRAUD_SEVERITY_DATA.map((entry, index) => (
@@ -309,17 +359,35 @@ export const DashboardPage: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(val: any) => formatCurrency(Number(val))}
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#fff', fontSize: '11px' }}
+                  content={({ active, payload }) => {
+                    if (!active || !payload || !payload.length) return null;
+                    const item = payload[0];
+                    return (
+                      <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-xl px-3.5 py-2.5 shadow-2xl text-white pointer-events-none">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: item.payload?.color || item.color }}
+                          />
+                          <span className="font-semibold text-xs text-slate-100">
+                            {item.name}
+                          </span>
+                        </div>
+                        <div className="text-sm font-bold text-emerald-400 font-mono">
+                          {formatCurrency(Number(item.value), currency)}
+                        </div>
+                      </div>
+                    );
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-100">
+          <div className="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">
             {EXPENSE_CATEGORIES.map((item) => (
               <div key={item.name} className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                <span className="text-[11px] text-slate-600 truncate">{item.name}</span>
+                <span className="text-[11px] font-medium text-slate-700 dark:text-slate-200 truncate">{item.name}</span>
               </div>
             ))}
           </div>
@@ -340,18 +408,18 @@ export const DashboardPage: React.FC = () => {
             {agents?.slice(0, 3).map((agent) => (
               <div
                 key={agent.id}
-                className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors"
+                className="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/70 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-200"
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600 shrink-0 mt-0.5">
+                  <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5">
                     <Bot className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900">{agent.agentName}</span>
-                      <span className="font-mono text-[10px] text-slate-400">{agent.runId}</span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">{agent.agentName}</span>
+                      <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">{agent.runId}</span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-1">{agent.outputSummary}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 line-clamp-1">{agent.outputSummary}</p>
                   </div>
                 </div>
 
@@ -362,7 +430,7 @@ export const DashboardPage: React.FC = () => {
                   >
                     {agent.status}
                   </Badge>
-                  <span className="text-[10px] text-slate-400">{formatDateTime(agent.startTime)}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDateTime(agent.startTime)}</span>
                 </div>
               </div>
             ))}

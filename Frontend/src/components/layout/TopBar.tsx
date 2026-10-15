@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, LogOut, Bell, Activity, Sun, Moon, Globe, Download } from 'lucide-react';
+import { Menu, Search, LogOut, Bell, Activity, Sun, Moon, Globe, Download, Palette } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useTheme } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
 import { Breadcrumbs } from './Breadcrumbs';
+import { AdminCustomizationModal } from '@/components/admin/AdminCustomizationModal';
 
 export interface TopBarProps {
   onOpenMobile: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
-  const { user, logout } = useAuth();
-  const { mode, toggleTheme } = useTheme();
+  const { user, logout, hasRole } = useAuth();
+  const { mode, toggleTheme, appName } = useTheme();
   const { language, setLanguage, t } = useI18n();
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [canInstall, setCanInstall] = useState(false);
+  const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+
+  const isAdmin = hasRole('ROLE_ADMIN') || user?.roles?.includes('ROLE_ADMIN');
 
   useEffect(() => {
     const handleBeforeInstall = (e: any) => {
@@ -39,7 +43,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 px-4 sm:px-6 backdrop-blur-md transition-colors">
+    <>
+      <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 px-4 sm:px-6 backdrop-blur-md transition-colors">
       {/* Left: Mobile Toggle & Breadcrumbs */}
       <div className="flex items-center gap-4">
         <button
@@ -62,7 +67,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
           <input
             type="text"
             placeholder={t('searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.2)] focus:bg-white dark:focus:bg-slate-900 transition-all duration-200"
           />
         </div>
 
@@ -70,7 +75,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
         {canInstall && (
           <button
             onClick={handleInstallPwa}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-semibold hover:bg-brand-100 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-semibold hover:bg-brand-100 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
             title="Install FinSight AI as Progressive Web App"
           >
             <Download className="w-3.5 h-3.5" />
@@ -83,7 +88,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
           <button
             onClick={() => setLanguage('en')}
             className={`px-1.5 py-0.5 rounded font-semibold text-[11px] transition-all ${
-              language === 'en' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'
+              language === 'en' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
           >
             EN
@@ -91,7 +96,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
           <button
             onClick={() => setLanguage('hi')}
             className={`px-1.5 py-0.5 rounded font-semibold text-[11px] transition-all ${
-              language === 'hi' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'
+              language === 'hi' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
           >
             हिंदी
@@ -101,20 +106,32 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:shadow-sm hover:scale-105 active:scale-95 transition-all duration-150"
           title="Toggle Light / Dark Mode"
         >
-          {mode === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
+          {mode === 'dark' ? <Sun className="w-4 h-4 text-amber-400 hover:rotate-45 transition-transform" /> : <Moon className="w-4 h-4 text-slate-700 hover:-rotate-12 transition-transform" />}
         </button>
 
         {/* Backend Gateway Health Indicator */}
-        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold">
+        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold shadow-sm hover:shadow-[0_0_12px_rgba(16,185,129,0.25)] transition-all">
           <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
           <span>{t('gatewayConnected')}</span>
         </div>
 
         {/* Vertical Divider */}
         <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
+
+        {/* Admin Customize Trigger */}
+        {isAdmin && (
+          <button
+            onClick={() => setIsCustomizerOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 hover:shadow-md hover:shadow-indigo-500/25 hover:border-indigo-300 dark:hover:border-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+            title="Admin Platform & Theme Customizer"
+          >
+            <Palette className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span className="hidden sm:inline">Customize</span>
+          </button>
+        )}
 
         {/* User Info & Role */}
         <div className="flex items-center gap-2">
@@ -130,7 +147,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
           {/* Logout Action */}
           <button
             onClick={logout}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-xs font-medium transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-rose-950/40 hover:text-red-700 dark:hover:text-rose-300 hover:border-red-200 dark:hover:border-rose-800 text-xs font-medium transition-all"
             title={t('logout')}
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -138,6 +155,14 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobile }) => {
           </button>
         </div>
       </div>
-    </header>
+
+      </header>
+
+      {/* Admin Customization Modal */}
+      <AdminCustomizationModal
+        isOpen={isCustomizerOpen}
+        onClose={() => setIsCustomizerOpen(false)}
+      />
+    </>
   );
 };

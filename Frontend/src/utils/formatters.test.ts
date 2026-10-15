@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import {
   formatCurrency,
+  getCurrencySymbol,
   formatPercentage,
   getStatusBadgeVariant,
   getSeverityBadgeVariant,
@@ -10,6 +10,14 @@ describe('Formatters Utility', () => {
   it('formats USD currency correctly', () => {
     expect(formatCurrency(1485230.5, 'USD')).toContain('1,485,230.50');
     expect(formatCurrency(0, 'USD')).toContain('0.00');
+  });
+
+  it('formats INR (₹) currency correctly', () => {
+    const inrFormatted = formatCurrency(2325630.5, 'INR');
+    expect(inrFormatted).toContain('₹');
+    expect(getCurrencySymbol('INR')).toBe('₹');
+    expect(getCurrencySymbol('USD')).toBe('$');
+    expect(getCurrencySymbol('EUR')).toBe('€');
   });
 
   it('formats percentage correctly', () => {

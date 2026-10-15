@@ -1,0 +1,67 @@
+{
+  "cluster": "finsight-event-mesh",
+  "version": "1.0",
+  "broker": "Apache Kafka / RabbitMQ",
+  "topics": [
+    {
+      "name": "financial.transactions",
+      "partitions": 6,
+      "replicationFactor": 3,
+      "retentionHours": 168,
+      "cleanupPolicy": "delete",
+      "description": "Inbound and processed financial ledger transactions with SHA-256 idempotency fingerprints",
+      "schema": {
+        "type": "record",
+        "fields": ["referenceNumber", "accountId", "accountNumber", "amount", "currency", "transactionType", "status", "category", "timestamp", "correlationId"]
+      }
+    },
+    {
+      "name": "fraud.alerts",
+      "partitions": 4,
+      "replicationFactor": 3,
+      "retentionHours": 720,
+      "cleanupPolicy": "compact,delete",
+      "description": "Multi-factor AML anomaly alerts, velocity trigger events, and risk scores from fraud-detection-service",
+      "schema": {
+        "type": "record",
+        "fields": ["alertReference", "transactionId", "accountNumber", "riskScore", "severity", "detectionRule", "reasons", "detectedAt", "correlationId"]
+      }
+    },
+    {
+      "name": "reconciliation.events",
+      "partitions": 4,
+      "replicationFactor": 3,
+      "retentionHours": 336,
+      "cleanupPolicy": "delete",
+      "description": "Deterministic reconciliation run completions, match rates, and discrepancy escalations",
+      "schema": {
+        "type": "record",
+        "fields": ["runReference", "exactMatches", "toleranceMatches", "discrepanciesCount", "matchRatePercentage", "status", "timestamp"]
+      }
+    },
+    {
+      "name": "ai.agent.telemetry",
+      "partitions": 4,
+      "replicationFactor": 3,
+      "retentionHours": 168,
+      "cleanupPolicy": "delete",
+      "description": "Real-time execution telemetry, tool call dispatches, and human-in-the-loop approval gates from 9 AI agents",
+      "schema": {
+        "type": "record",
+        "fields": ["runId", "agentName", "status", "inputPrompt", "toolsInvoked", "executionTimeMs", "requiresHumanApproval", "timestamp"]
+      }
+    },
+    {
+      "name": "audit.events",
+      "partitions": 6,
+      "replicationFactor": 3,
+      "retentionHours": 8760,
+      "cleanupPolicy": "compact",
+      "description": "Immutable append-only regulatory audit log with before/after JSON snapshots and actor attribution",
+      "schema": {
+        "type": "record",
+        "fields": ["eventId", "timestamp", "actor", "action", "serviceName", "entityType", "entityId", "outcome", "correlationId", "ipAddress", "details"]
+      }
+    }
+  ]
+}

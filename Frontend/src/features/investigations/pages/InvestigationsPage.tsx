@@ -28,15 +28,15 @@ export const InvestigationsPage: React.FC = () => {
       key: 'caseNumber',
       header: 'Case ID',
       sortable: true,
-      render: (c) => <span className="font-mono text-xs font-bold text-indigo-700">{c.caseNumber}</span>,
+      render: (c) => <span className="font-mono text-xs font-bold text-indigo-700 dark:text-indigo-400">{c.caseNumber}</span>,
     },
     {
       key: 'title',
       header: 'Case Title & Subject',
       render: (c) => (
         <div>
-          <div className="font-semibold text-slate-900 text-xs">{c.title}</div>
-          <div className="text-[11px] text-slate-400">Assigned: {c.assignedAnalyst}</div>
+          <div className="font-semibold text-slate-900 dark:text-white text-xs">{c.title}</div>
+          <div className="text-[11px] text-slate-400 dark:text-slate-500">Assigned: {c.assignedAnalyst}</div>
         </div>
       ),
     },
@@ -46,7 +46,7 @@ export const InvestigationsPage: React.FC = () => {
       sortable: true,
       className: 'text-center',
       render: (c) => (
-        <span className="font-black text-xs text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+        <span className="font-black text-xs text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800">
           {c.riskScore} / 100
         </span>
       ),
@@ -72,19 +72,19 @@ export const InvestigationsPage: React.FC = () => {
     {
       key: 'createdAt',
       header: 'Opened',
-      render: (c) => <span className="text-slate-500 text-xs">{formatDateTime(c.createdAt)}</span>,
+      render: (c) => <span className="text-slate-500 dark:text-slate-400 text-xs">{formatDateTime(c.createdAt)}</span>,
     },
   ];
 
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
             Investigation Workspace
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Evidence-based financial forensics, provenance tracking, and regulatory audit dossier assembly.
           </p>
         </div>
@@ -110,7 +110,7 @@ export const InvestigationsPage: React.FC = () => {
             <Card
               title={
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-indigo-600">{selectedCase.caseNumber}:</span>
+                  <span className="font-mono text-indigo-600 dark:text-indigo-400">{selectedCase.caseNumber}:</span>
                   <span>{selectedCase.title}</span>
                 </div>
               }
@@ -122,15 +122,15 @@ export const InvestigationsPage: React.FC = () => {
               }
             >
               {/* Executive Case Summary */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed mb-6">
-                <span className="font-bold text-slate-900 block mb-1">Executive Forensic Summary:</span>
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+                <span className="font-bold text-slate-900 dark:text-white block mb-1">Executive Forensic Summary:</span>
                 {selectedCase.summary}
               </div>
 
               {/* Evidence Provenance Trace */}
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-brand-600" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-brand-600 dark:text-brand-400" />
                   Forensic Evidence & Provenance Hierarchy ({evidence?.length || 3} items)
                 </h4>
 
@@ -138,10 +138,10 @@ export const InvestigationsPage: React.FC = () => {
                   {evidence?.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-subtle flex flex-col gap-2"
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 shadow-subtle flex flex-col gap-2"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900">{item.title}</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">{item.title}</span>
                         <Badge
                           variant={
                             item.provenance === 'OBSERVED_DATA'
@@ -155,17 +155,17 @@ export const InvestigationsPage: React.FC = () => {
                           {item.provenance.replace(/_/g, ' ')}
                         </Badge>
                       </div>
-                      <p className="text-xs text-slate-600">{item.description}</p>
-                      <span className="text-[10px] text-slate-400">{formatDateTime(item.createdAt)}</span>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">{item.description}</p>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDateTime(item.createdAt)}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Adjudication Action Gate */}
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <UserCheck className="w-4 h-4 text-emerald-600" />
+              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Compliance Officer Review Gate</span>
                 </div>
                 <div className="flex gap-2">
