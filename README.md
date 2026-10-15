@@ -54,63 +54,13 @@ FinSight_AI_Application/
 
 ---
 
-## 2. System Architecture
 
-```mermaid
-graph TD
-    Client[Web Client: React + Vite SPA] -->|HTTP / REST| Gateway[API Gateway :8080]
-    Gateway -->|Service Discovery| Eureka[Eureka Server :8761]
-    
-    subgraph Core Domain Microservices
-        Auth[Auth Service :8081]
-        FinancialData[Financial Data Service :8082]
-        Recon[Reconciliation Service :8083]
-        Fraud[Fraud Detection Service :8084]
-        Audit[Audit & Reporting Service :8085]
-        Insights[Financial Insights Service :8086]
-        AIOrchestrator[AI Orchestrator Service :8087]
-    end
 
-    Gateway --> Auth
-    Gateway --> FinancialData
-    Gateway --> Recon
-    Gateway --> Fraud
-    Gateway --> Audit
-    Gateway --> Insights
-    Gateway --> AIOrchestrator
-
-    AIOrchestrator -.->|OpenFeign Tools| FinancialData
-    AIOrchestrator -.->|OpenFeign Tools| Recon
-    AIOrchestrator -.->|OpenFeign Tools| Fraud
-    AIOrchestrator -.->|OpenFeign Tools| Insights
-    AIOrchestrator -.->|OpenFeign Tools| Audit
-
-    subgraph Data Tier (Isolated PostgreSQL Schemas)
-        DB1[(finsight_auth)]
-        DB2[(finsight_financial_data)]
-        DB3[(finsight_reconciliation)]
-        DB4[(finsight_fraud)]
-        DB5[(finsight_audit)]
-        DB6[(finsight_insights)]
-        DB7[(finsight_ai)]
-    end
-
-    Auth --> DB1
-    FinancialData --> DB2
-    Recon --> DB3
-    Fraud --> DB4
-    Audit --> DB5
-    Insights --> DB6
-    AIOrchestrator --> DB7
-```
-
----
-
-## 3. Frontend Application Tier
+## 2. Frontend Application Tier
 
 The frontend is a standalone, enterprise-grade Single Page Application (SPA) designed with digital banking design tokens, fluid dark/light theming, high-density financial data tables, and dynamic visual analytics.
 
-### 3.1. Implemented Modules & Features
+### 2.1. Implemented Modules & Features
 
 | Module | Route | Key Capabilities |
 |---|---|---|
@@ -130,7 +80,7 @@ The frontend is a standalone, enterprise-grade Single Page Application (SPA) des
 | **Cryptographic Audit Log** | `/audit` | Immutable audit event log with correlation IDs (`X-Correlation-ID`), actor provenance, and state before/after diffs. |
 | **User Management** | `/users` | Administrator console for user account provisioning, role assignment, and access revocation. |
 
-### 3.2. Offline Sandbox Evaluation & Cloud Deployment
+### 2.2. Offline Sandbox Evaluation & Cloud Deployment
 
 * **Zero-Downtime Sandbox Evaluation**: Built-in mock fixtures across `finSightApi.ts` and `authApi.ts` ensure the UI functions seamlessly even if backend services are offline.
 * **Standalone Deployment (Vercel & Netlify)**: The frontend can be hosted independently on **Vercel** (`vercel.json`) or **Netlify** (`_redirects`) without running the backend microservices.
@@ -138,7 +88,7 @@ The frontend is a standalone, enterprise-grade Single Page Application (SPA) des
 
 ---
 
-## 4. Backend Microservices Ecosystem
+## 3. Backend Microservices Ecosystem
 
 | Service Name | Port | Database | Primary Responsibility | Key Endpoints |
 |---|---|---|---|---|
@@ -154,7 +104,7 @@ The frontend is a standalone, enterprise-grade Single Page Application (SPA) des
 
 ---
 
-## 5. Specialist Financial AI Agents
+## 4. Specialist Financial AI Agents
 
 The `ai-orchestrator-service` hosts 9 domain specialist agents coordinated by a meta-orchestrator:
 
@@ -170,7 +120,7 @@ The `ai-orchestrator-service` hosts 9 domain specialist agents coordinated by a 
 
 ---
 
-## 6. Pre-Seeded Evaluator Personas
+## 5. Pre-Seeded Evaluator Personas
 
 The platform includes 4 pre-configured personas for role-based testing:
 
@@ -183,7 +133,7 @@ The platform includes 4 pre-configured personas for role-based testing:
 
 ---
 
-## 7. Quick Start & Execution Guide
+## 6. Quick Start & Execution Guide
 
 ### Prerequisites
 * **Java 17** (JDK 17 configured in `JAVA_HOME`)
@@ -264,15 +214,10 @@ FinSight AI's frontend is fully pre-configured for standalone cloud deployment:
 5. *(Optional)* Add `VITE_API_BASE_URL` in Environment Variables if connecting to a hosted backend.
 6. `Frontend/vercel.json` automatically handles SPA routing rewrites so page reloads work smoothly.
 
-#### Deploying on Netlify / Cloudflare Pages:
-1. Set **Base Directory** to `Frontend`.
-2. Set **Build Command** to `npm run build`.
-3. Set **Publish Directory** to `Frontend/dist`.
-4. `Frontend/public/_redirects` automatically manages client-side route redirects.
 
 ---
 
-## 8. Automated Testing & Verification
+## 7. Automated Testing & Verification
 
 ### Backend Tests
 ```bash
@@ -289,7 +234,7 @@ npm test
 
 ---
 
-## 9. Postman API Collection
+## 8. Postman API Collection
 
 A pre-configured Postman v2.1 collection is included in the root directory:
 📁 **[`FinSight_AI_API_Collection.postman_collection.json`](./FinSight_AI_API_Collection.postman_collection.json)**
@@ -300,6 +245,20 @@ A pre-configured Postman v2.1 collection is included in the root directory:
 
 ---
 
-## 10. License & Copyright
+## 9. License & Copyright
 
 Developed for FinSight AI Platform © 2026. All rights reserved.
+
+---
+
+<p align="center">
+  <b> Designed & Developed with ❤️ by Nithin Kumar Badduluri</b>
+  <br/>
+  <a href="https://www.linkedin.com/in/nithin-kumar-badduluri-3942512a6">LinkedIn</a> •
+  <a href="https://github.com/NKumar-B">GitHub</a> •
+  <a href="https://nithin-portfolio2-steel.vercel.app/">Portfolio</a>
+</p>
+
+<p align="center">
+  © 2026 FinSight AI. All rights reserved.
+</p>
