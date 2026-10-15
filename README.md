@@ -1,49 +1,64 @@
-# FinSight AI — Enterprise Microservices Backend Platform
+# FinSight AI — Enterprise Financial Intelligence & Multi-Agent Platform
 
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0.3-blue.svg)](https://spring.io/projects/spring-cloud)
+[![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3-blue.svg)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.x-purple.svg)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8.svg)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-2.x-green.svg)](https://vitest.dev/)
+[![Vercel Ready](https://img.shields.io/badge/Deployment-Vercel%20%7C%20Netlify-black.svg)](https://vercel.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
-> **FinSight AI** is a production-grade, distributed financial intelligence platform designed for autonomous ledger reconciliation, multi-factor AML & fraud anomaly detection, predictive cash-flow forecasting, AR aging analysis, compliance auditing, and multi-agent AI orchestration.
+> **FinSight AI** is a production-grade, distributed fintech platform designed for autonomous multi-agent financial intelligence, deterministic 4-step reconciliation, AML velocity surveillance, forensic case investigations, predictive cash-flow forecasting, AR DSO aging, cryptographic audit trails, and human-in-the-loop review approvals.
 
 ---
 
-## Project Structure
+## 1. High-Level Project Structure
 
-The project is organized into three decoupled architectural tiers:
+The project is structured into three decoupled architectural tiers:
 
 ```
 FinSight_AI_Application/
-├── Backend/              # Multi-module Spring Boot 3.3 microservices ecosystem
-│   ├── eureka-server/           # Service discovery (:8761)
-│   ├── api-gateway/             # Reactive Gateway & JWT security filter (:8080)
-│   ├── auth-service/            # Auth, ChaCha20 crypto, OTP, and RBAC menu (:8081)
-│   ├── financial-data-service/  # Accounts & transaction ledgers (:8082)
-│   ├── reconciliation-service/  # Deterministic matching engine (:8083)
-│   ├── fraud-detection-service/ # Velocity & anomaly detection (:8084)
-│   ├── audit-reporting-service/ # Immutable audit trail (:8085)
-│   ├── financial-insights-service/ # Cash-flow runway & AR aging (:8086)
-│   ├── ai-orchestrator-service/ # 9 Specialist AI agents (:8087)
-│   ├── finsight-common/         # Shared models, ChaCha20 AEAD, and security utils
-│   ├── pom.xml                  # Parent Maven Reactor POM
-│   └── docker-compose.yml       # Backend multi-container orchestration
-├── Frontend/             # Web application client tier (React / Vite / TypeScript)
-├── Middleware/           # Event brokers (Kafka/RabbitMQ), Redis caching & reverse proxy
-├── .env                  # Root environment secrets (excluded from Git)
-└── FinSight_AI_API_Collection.postman_collection.json # API collection
+├── Frontend/                                  # Web client tier (React 18 / Vite 6 / TypeScript / Tailwind CSS)
+│   ├── src/                                   # 14 Modular feature suites, UI design system & API services
+│   ├── public/                                # Static PWA assets, icons, and _redirects for Netlify/Cloudflare
+│   ├── vercel.json                            # Vercel SPA routing rewrite rules (prevents 404s on reload)
+│   ├── vite.config.ts                         # Vite bundler, proxy configuration & Vitest test setup
+│   ├── tsconfig.app.json                      # Strict TypeScript production compiler options
+│   └── package.json                           # Frontend scripts & dependencies
+├── Backend/                                   # Multi-module Spring Boot 3.3.4 microservices ecosystem
+│   ├── eureka-server/                         # Centralized Service Registry (:8761)
+│   ├── api-gateway/                           # Reactive Gateway & JWT security filter (:8080)
+│   ├── auth-service/                          # User Auth, ChaCha20 crypto, OTP & RBAC (:8081)
+│   ├── financial-data-service/                # Treasury accounts & transaction ledger ingestion (:8082)
+│   ├── reconciliation-service/                # Deterministic 4-stage matching engine (:8083)
+│   ├── fraud-detection-service/               # Multi-factor AML & velocity anomaly radar (:8084)
+│   ├── audit-reporting-service/               # Immutable cryptographic audit trails (:8085)
+│   ├── financial-insights-service/            # Cash-flow runway & AR DSO aging matrix (:8086)
+│   ├── ai-orchestrator-service/               # 9 Specialist financial AI agents (:8087)
+│   ├── finsight-common/                       # Shared DTOs, ChaCha20 AEAD & security filters
+│   ├── pom.xml                                # Parent Maven Reactor POM
+│   └── docker-compose.yml                     # Multi-container local orchestration
+├── Middleware/                                # Kafka, RabbitMQ, Redis caching configurations
+├── Documentation/                             # Architectural blueprints and API documentation
+├── FinSight_AI_API_Collection.postman_collection.json # Automated Postman v2.1 API test suite
+├── start-all-microservices.ps1                # 1-Click launcher for all microservices (PowerShell)
+├── start-all-microservices.bat                # 1-Click launcher for all microservices (CMD / Batch)
+├── start-all-microservices.sh                 # 1-Click launcher for all microservices (Bash / Linux / macOS)
+├── stop-all-microservices.ps1                 # Graceful termination script for all background services
+└── stop-all-microservices.bat                 # Windows batch stopper script
 ```
 
 ---
 
-## 1. High-Level Architecture
-
-The platform follows a modern, decoupled microservices architecture with a reactive API Gateway, centralized Service Registry (Netflix Eureka), OpenFeign inter-service communication with correlation ID propagation, and isolated PostgreSQL databases per bounded domain.
+## 2. System Architecture
 
 ```mermaid
 graph TD
-    Client[Web / Mobile / Postman Clients] -->|HTTP / REST| Gateway[API Gateway :8080]
+    Client[Web Client: React + Vite SPA] -->|HTTP / REST| Gateway[API Gateway :8080]
     Gateway -->|Service Discovery| Eureka[Eureka Server :8761]
     
     subgraph Core Domain Microservices
@@ -70,7 +85,7 @@ graph TD
     AIOrchestrator -.->|OpenFeign Tools| Insights
     AIOrchestrator -.->|OpenFeign Tools| Audit
 
-    subgraph Data Tier (Isolated Schemas)
+    subgraph Data Tier (Isolated PostgreSQL Schemas)
         DB1[(finsight_auth)]
         DB2[(finsight_financial_data)]
         DB3[(finsight_reconciliation)]
@@ -91,179 +106,200 @@ graph TD
 
 ---
 
-## 2. Microservices Service Registry & Port Mapping
+## 3. Frontend Application Tier
+
+The frontend is a standalone, enterprise-grade Single Page Application (SPA) designed with digital banking design tokens, fluid dark/light theming, high-density financial data tables, and dynamic visual analytics.
+
+### 3.1. Implemented Modules & Features
+
+| Module | Route | Key Capabilities |
+|---|---|---|
+| **Landing & Overview** | `/` | Product highlights, enterprise security credentials, interactive features preview. |
+| **Authentication & RBAC** | `/login` | Secure JWT authentication, ChaCha20-Poly1305 OTP verification, password reset, and role-gated routes. |
+| **Executive Dashboard** | `/dashboard` | Real-time liquidity KPI cards, reconciliation throughput, AML risk radars, and volume trends. |
+| **Financial Data & Ledger** | `/financial-data` | Multi-currency treasury account ledgers, institutional bank document validator (Chase/Citi/BoA), and drag-and-drop CSV/PDF ingestion. |
+| **4-Step Reconciliation** | `/reconciliation` | Deterministic matching engine (Exact, Tolerance, 1-to-many), discrepancy breakdown, and manual adjustment/write-off actions. |
+| **AML Fraud Monitoring** | `/fraud` | Velocity anomaly alerts, risk score gauges (0-100), severity badges, SAR filing triggers, and detection rule analysis. |
+| **Forensic Investigations** | `/investigations` | Evidence dossier provenance, chain of custody, cryptographic SHA-256 hash ledger checks, and action gate approvals. |
+| **Specialist AI Directory** | `/agents` | Directory of 9 autonomous financial agents, live thought-and-action execution traces, and human review sign-off modal. |
+| **Expense Intelligence** | `/expenses` | Category spend breakdowns (SaaS, Payroll, Infrastructure), vendor concentration risks, and anomaly flags. |
+| **Invoices & AR Aging** | `/invoices` | Accounts receivable aging matrix (`0-30`, `31-60`, `61-90`, `90+` days overdue), DSO calculation, and collections tracking. |
+| **Predictive Cash Flow** | `/cash-flow` | 30/60/90-Day predictive cash runway model with confidence interval bands and inflow/outflow balance trajectories. |
+| **AI Copilot** | `/copilot` | Natural language conversational copilot for treasury inquiries, anomaly explanations, and operational queries. |
+| **Reports & Export Engine** | `/reports` | Institutional PDF & Excel export engine with cryptographic digital signatures and executive packages. |
+| **Cryptographic Audit Log** | `/audit` | Immutable audit event log with correlation IDs (`X-Correlation-ID`), actor provenance, and state before/after diffs. |
+| **User Management** | `/users` | Administrator console for user account provisioning, role assignment, and access revocation. |
+
+### 3.2. Offline Sandbox Evaluation & Cloud Deployment
+
+* **Zero-Downtime Sandbox Evaluation**: Built-in mock fixtures across `finSightApi.ts` and `authApi.ts` ensure the UI functions seamlessly even if backend services are offline.
+* **Standalone Deployment (Vercel & Netlify)**: The frontend can be hosted independently on **Vercel** (`vercel.json`) or **Netlify** (`_redirects`) without running the backend microservices.
+* **Live Gateway Integration**: Set `VITE_API_BASE_URL` in `.env` to connect directly to the Spring Cloud API Gateway.
+
+---
+
+## 4. Backend Microservices Ecosystem
 
 | Service Name | Port | Database | Primary Responsibility | Key Endpoints |
 |---|---|---|---|---|
-| **`eureka-server`** | `8761` | — | Service discovery & registration | `/eureka/*`, `/` |
-| **`api-gateway`** | `8080` | — | Reverse proxy, JWT authentication filter, request correlation | `/api/v1/**` |
-| **`auth-service`** | `8081` | `finsight_auth` | User registration, login, refresh tokens, RBAC roles & permissions | `/api/v1/auth/**`, `/api/v1/users/**` |
-| **`financial-data-service`** | `8082` | `finsight_financial_data` | Account management, transaction ingestion (CSV/JSON), SHA-256 idempotency | `/api/v1/accounts/**`, `/api/v1/transactions/**` |
+| **`eureka-server`** | `8761` | — | Service discovery & registration registry | `/eureka/*`, `/` |
+| **`api-gateway`** | `8080` | — | Reactive reverse proxy, centralized JWT authentication filter, correlation tracking | `/api/v1/**` |
+| **`auth-service`** | `8081` | `finsight_auth` | User authentication, registration, refresh tokens, ChaCha20-Poly1305 OTP, and RBAC menus | `/api/v1/auth/**`, `/api/v1/users/**` |
+| **`financial-data-service`** | `8082` | `finsight_financial_data` | Account management, transaction ingestion (CSV/JSON), SHA-256 idempotency deduplication | `/api/v1/accounts/**`, `/api/v1/transactions/**` |
 | **`reconciliation-service`** | `8083` | `finsight_reconciliation` | Deterministic matching engine (Exact, Tolerance, 1-to-many), discrepancy review workflows | `/api/v1/reconciliation/runs/**`, `/api/v1/reconciliation/discrepancies/**` |
-| **`fraud-detection-service`** | `8084` | `finsight_fraud` | Multi-factor AML & anomaly rules, risk scoring (0-100), alert lifecycle investigation | `/api/v1/fraud/evaluate`, `/api/v1/fraud/alerts/**` |
+| **`fraud-detection-service`** | `8084` | `finsight_fraud` | Multi-factor AML velocity rules, risk scoring (0-100), alert lifecycle investigation | `/api/v1/fraud/evaluate`, `/api/v1/fraud/alerts/**` |
 | **`audit-reporting-service`** | `8085` | `finsight_audit` | Immutable audit trail persistence, state before/after snapshots, compliance reports | `/api/v1/audit/events/**`, `/api/v1/audit/reports/**` |
 | **`financial-insights-service`** | `8086` | `finsight_insights` | Invoice balance tracking, AR aging buckets, expense breakdown, 30/60/90-day cash flow runways | `/api/v1/insights/invoices/**`, `/api/v1/insights/analytics/**` |
 | **`ai-orchestrator-service`** | `8087` | `finsight_ai` | 9 specialist financial AI agents, microservice tool invocation, human approval review gates | `/api/v1/ai/execute`, `/api/v1/ai/runs/**`, `/api/v1/ai/tools`, `/api/v1/ai/agents` |
 
 ---
 
-## 3. Key Architectural Features
+## 5. Specialist Financial AI Agents
 
-### 3.1. Zero-Trust Gateway & Centralized JWT Validation
-- **`JwtAuthenticationGatewayFilterFactory`** in `api-gateway` intercepts every incoming request.
-- Public routes (`/api/v1/auth/**`, `/actuator/**`, Swagger docs) bypass security checks.
-- Authenticated requests have their JWT validated using HMAC-SHA256 (`JJWT 0.12.6`).
-- Extracted claims (`X-User-Id`, `X-User-Email`, `X-User-Roles`) are injected into the downstream headers for microservices to consume without repeating cryptographic token validation.
+The `ai-orchestrator-service` hosts 9 domain specialist agents coordinated by a meta-orchestrator:
 
-### 3.2. End-to-End Distributed Tracing
-- Every HTTP request passing through the API Gateway is tagged with a unique `X-Correlation-ID` header (or generated via UUID if absent).
-- Transmitted through `CorrelationIdFilter`, maintained in thread-local storage via `CorrelationIdContext`, and passed forward across OpenFeign clients using `FeignCorrelationInterceptor`.
-
-### 3.3. Deterministic Transaction Reconciliation Engine
-- **Matching Tiers:**
-  1. **Exact Match:** Identical amount, matching currency, opposite direction, matching source reference.
-  2. **Tolerance Match:** Date variance within configurable window (default ±3 days) and amount variance within configurable tolerance (default ±0.05).
-  3. **One-to-Many Aggregation Match:** Matches a batch of split transactions against a single aggregate settlement entry.
-- **Discrepancy Categorization:** Flags `AMOUNT_MISMATCH`, `TIMING_DIFFERENCE`, `UNMATCHED_SOURCE`, or `UNMATCHED_TARGET`.
-- **Review Decision Workflows:** Enables reviewers to record `APPROVE_MATCH`, `REJECT_MATCH`, `WRITE_OFF`, `ADJUSTMENT_REQUIRED`, or `ESCALATE_TO_COMPLIANCE`.
-
-### 3.4. Multi-Factor Fraud Detection & Risk Scoring
-- Evaluates inbound transactions through a multi-factor rules matrix:
-  - **`HIGH_AMOUNT_ANOMALY`**: Weight 35 (Transactions exceeding threshold, e.g. $50,000).
-  - **`HIGH_VELOCITY_SPIKE`**: Weight 30 (Burst of transactions within a short rolling timeframe).
-  - **`CROSS_BORDER_ANOMALY`**: Weight 25 (High-risk or unexpected counterparty jurisdiction).
-  - **`SUSPICIOUS_ROUND_AMOUNT`**: Weight 20 (Unusually clean round amounts, e.g. $10,000.00).
-  - **`DUPLICATE_CANDIDATE`**: Weight 25 (Identical amount and recipient within hours).
-  - **`CONNECTED_ACCOUNTS_CYCLE`**: Weight 40 (Circular funds routing).
-- Outputs normalized **Risk Score (0–100)** mapped to severity tiers (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
-
-### 3.5. Predictive Financial Insights & Cash-Flow Runway
-- **AR Aging Buckets:** Dynamically computes outstanding receivables across `0-30`, `31-60`, `61-90`, and `90+` days overdue.
-- **Expense Intelligence:** Categorizes debit outflows (SaaS, Payroll, Infrastructure, Legal) and identifies top vendor concentration risks.
-- **Runway Forecast:** Models opening cash, daily projected operational inflows and recurring outflows over 30, 60, or 90 days.
-
-### 3.6. 9 Specialist Financial AI Agents & Human-in-the-Loop Gates
-The `ai-orchestrator-service` provides a multi-agent hierarchy orchestrated by a Supervisory Meta-Orchestrator:
-
-1. **`SupervisoryMetaOrchestratorAgent`**: Decomposes natural language queries, classifies intent, delegates tasks to domain specialists, and enforces human sign-off rules.
-2. **`FinancialDataAnalystAgent`**: Ingestion health, ledger balances, and currency exposures.
-3. **`ReconciliationSpecialistAgent`**: Matches entries, uncovers discrepancy patterns, and flags settlement breaks.
-4. **`FraudDetectionSpecialistAgent`**: Explains alert vectors, identifies suspicious clusters, and recommends protective measures.
-5. **`ExpenseOptimizationAdvisorAgent`**: Identifies duplicate subscriptions, vendor concentrations, and cost-reduction levers.
+1. **`SupervisoryMetaOrchestratorAgent`**: Decomposes natural language queries, classifies domain intent, coordinates specialists, and enforces human review sign-offs.
+2. **`FinancialDataAnalystAgent`**: Ingestion integrity, account balances, and multi-currency exposures.
+3. **`ReconciliationSpecialistAgent`**: Matches complex entries, explains discrepancy patterns, and handles settlement breaks.
+4. **`FraudDetectionSpecialistAgent`**: Evaluates velocity vectors, flags shell entities, and suggests transaction holds.
+5. **`ExpenseOptimizationAdvisorAgent`**: Discovers duplicate subscriptions, vendor concentrations, and cost-reduction opportunities.
 6. **`InvoiceArCollectionsSpecialistAgent`**: Analyzes overdue invoice tranches and suggests prioritized dunning sequences.
 7. **`CashFlowForecastSpecialistAgent`**: Simulates cash deficits, runway milestones, and working capital buffers.
-8. **`AuditComplianceInvestigatorAgent`**: Forensic inspection of immutable audit records, actor mutations, and SOX controls.
+8. **`AuditComplianceInvestigatorAgent`**: Forensic inspection of immutable audit records, actor mutations, and regulatory controls.
 9. **`ReportSynthesizerSpecialistAgent`**: Synthesizes cross-service intelligence into board-level executive summaries.
 
-#### Human Approval Gate
-Whenever an agent plan involves high-impact financial actions (such as ledger write-offs, manual balance adjustments, or account freezes):
-- The run is placed in `AWAITING_HUMAN_APPROVAL` status.
-- Execution requires authorized human review via `POST /api/v1/ai/runs/{runReference}/review` (`APPROVE` or `REJECT`).
+---
+
+## 6. Pre-Seeded Evaluator Personas
+
+The platform includes 4 pre-configured personas for role-based testing:
+
+| Persona / Role | Username | Password | Access Scope |
+| :--- | :--- | :--- | :--- |
+| **Platform Administrator** | `admin` | `AdminSecure2026!` | Universal access across all 14 modules, user management, and health telemetry |
+| **Financial Analyst** | `analyst_john` | `SecurePass2026!` | Treasury accounts, 4-step reconciliation, expense intelligence, invoices, cash-flow |
+| **Compliance Officer** | `compliance_officer` | `ComplianceSecure2026!` | AML velocity alerts, forensic evidence dossiers, and SAR filing |
+| **External Auditor** | `auditor_pwc` | `AuditorSecure2026!` | Read-only access to immutable audit trails, signed report packages, and hash ledger |
 
 ---
 
-## 4. Technology Stack
-
-- **Language:** Java 17 (Eclipse Temurin)
-- **Framework:** Spring Boot 3.3.4
-- **Cloud Components:** Spring Cloud 2023.0.3 (Gateway, Eureka Server, OpenFeign)
-- **Security:** Spring Security 6, JJWT 0.12.6, BCrypt
-- **Persistence:** Spring Data JPA, Hibernate 6, Flyway 10, PostgreSQL 16
-- **Data Ingestion:** Apache Commons CSV 1.11.0
-- **Documentation:** Springdoc OpenAPI (Swagger UI) 2.6.0
-- **Testing:** JUnit 5, Mockito 5, AssertJ, H2 Database
-- **Containers:** Docker, Docker Compose
-
----
-
-## 5. Local Setup & Execution Guide
+## 7. Quick Start & Execution Guide
 
 ### Prerequisites
-- JDK 17 installed and configured in `JAVA_HOME`
-- Apache Maven 3.9+
-- Docker & Docker Compose (optional, for containerized run)
-- PostgreSQL 16 (for standalone local execution)
+* **Java 17** (JDK 17 configured in `JAVA_HOME`)
+* **Apache Maven 3.9+**
+* **Node.js 20+** and **npm 10+**
+* **Docker & Docker Compose** (or local PostgreSQL 16)
 
-### 5.1. Build the Entire Backend Platform
+---
+
+### Option A: Launching All Microservices (1-Click)
+
+Launch Eureka, API Gateway, and all 7 domain microservices using the root scripts:
+
+* **Windows (PowerShell)**:
+  ```powershell
+  .\start-all-microservices.ps1
+  ```
+* **Windows (Command Prompt)**:
+  ```cmd
+  start-all-microservices.bat
+  ```
+* **Linux / macOS (Bash)**:
+  ```bash
+  chmod +x start-all-microservices.sh
+  ./start-all-microservices.sh
+  ```
+
+To gracefully terminate all background microservice processes:
+```powershell
+.\stop-all-microservices.ps1
+```
+
+---
+
+### Option B: Running via Docker Compose
+
 ```bash
 cd Backend
-mvn clean compile -DskipTests
+docker compose up -d --build
+docker compose ps
 ```
-To run tests across all modules:
+
+* **Eureka Dashboard**: [http://localhost:8761](http://localhost:8761)
+* **API Gateway**: [http://localhost:8080](http://localhost:8080)
+
+---
+
+### Option C: Running the Frontend Standalone
+
+```bash
+# Navigate to Frontend directory
+cd Frontend
+
+# Install dependencies
+npm install
+
+# Start development server on http://localhost:3000
+npm run dev
+
+# Run automated Vitest test suite
+npm test
+
+# Run strict TypeScript verification and production build
+npm run build
+```
+
+---
+
+### Option D: Deploying Only the Frontend (Vercel / Netlify)
+
+FinSight AI's frontend is fully pre-configured for standalone cloud deployment:
+
+#### Deploying on Vercel:
+1. Connect your GitHub repository on [Vercel](https://vercel.com/).
+2. Set **Root Directory** to `Frontend`.
+3. Set **Framework Preset** to `Vite`.
+4. Ensure **Build Command** is `npm run build` and **Output Directory** is `dist`.
+5. *(Optional)* Add `VITE_API_BASE_URL` in Environment Variables if connecting to a hosted backend.
+6. `Frontend/vercel.json` automatically handles SPA routing rewrites so page reloads work smoothly.
+
+#### Deploying on Netlify / Cloudflare Pages:
+1. Set **Base Directory** to `Frontend`.
+2. Set **Build Command** to `npm run build`.
+3. Set **Publish Directory** to `Frontend/dist`.
+4. `Frontend/public/_redirects` automatically manages client-side route redirects.
+
+---
+
+## 8. Automated Testing & Verification
+
+### Backend Tests
 ```bash
 cd Backend
 mvn test
 ```
 
-### 5.2. Running via Docker Compose (Recommended)
-Launch all PostgreSQL databases, Eureka, API Gateway, and all domain microservices with one command:
+### Frontend Tests
 ```bash
-cd Backend
-docker compose up -d --build
+cd Frontend
+npm test
 ```
-
-Verify service status:
-```bash
-cd Backend
-docker compose ps
-```
-
-Access the service registry:
-- Eureka Dashboard: [http://localhost:8761](http://localhost:8761)
-- API Gateway: [http://localhost:8080](http://localhost:8080)
-
-### 5.3. Running Locally (Step-by-Step)
-If running outside Docker:
-1. Start PostgreSQL on `localhost:5432` with username `finsight_user` and password `finsight_secure_pass_2026`.
-2. Run `Backend/docker/init-databases.sql` to initialize the 7 databases.
-3. Open a terminal in `Backend/`:
-   ```bash
-   cd Backend
-   ```
-4. Start `eureka-server`:
-   ```bash
-   mvn spring-boot:run -pl eureka-server
-   ```
-5. Start `api-gateway`:
-   ```bash
-   mvn spring-boot:run -pl api-gateway
-   ```
-6. Start remaining domain services in separate terminals (from `Backend`):
-   ```bash
-   mvn spring-boot:run -pl auth-service
-   mvn spring-boot:run -pl financial-data-service
-   mvn spring-boot:run -pl reconciliation-service
-   mvn spring-boot:run -pl fraud-detection-service
-   mvn spring-boot:run -pl audit-reporting-service
-   mvn spring-boot:run -pl financial-insights-service
-   mvn spring-boot:run -pl ai-orchestrator-service
-   ```
+* **6 Test Suites / 24 Tests**: Covers bank document validation, JWT session guards, login flows, button variants, report generation, and currency/percentage formatters.
 
 ---
 
-## 6. Postman API Collection
+## 9. Postman API Collection
 
-A fully configured Postman v2.1 collection is included in the root directory:
+A pre-configured Postman v2.1 collection is included in the root directory:
 📁 **[`FinSight_AI_API_Collection.postman_collection.json`](./FinSight_AI_API_Collection.postman_collection.json)**
 
-### How to Use:
-1. Open Postman and click **Import** -> select `FinSight_AI_API_Collection.postman_collection.json`.
-2. The collection uses the default environment variable `{{gateway_url}} = http://localhost:8080`.
-3. Run the **01. Auth Service -> Login** request. The test script will **automatically extract and store the JWT access token** into `{{jwt_token}}`.
-4. All subsequent requests automatically inherit the Bearer token for seamless testing!
+1. Import the collection into Postman.
+2. The collection defaults to `{{gateway_url}} = http://localhost:8080`.
+3. Run the **01. Auth Service -> Login** request; the script will **automatically extract and store the JWT access token** into `{{jwt_token}}` for subsequent requests.
 
 ---
 
-## 7. Role-Based Access Control (RBAC)
+## 10. License & Copyright
 
-The system includes pre-seeded roles:
-- `ROLE_ADMIN`: Unrestricted administrative access across all services.
-- `ROLE_FINANCIAL_ANALYST`: Manage financial data, initiate reconciliation, inspect insights.
-- `ROLE_COMPLIANCE_OFFICER`: Review fraud alerts, investigate AML incidents, approve AI human gates.
-- `ROLE_AUDITOR`: Read-only access to immutable audit trails and compliance reports.
-- `ROLE_USER`: Standard business user.
-
----
-
-## 8. License & Copyright
 Developed for FinSight AI Platform © 2026. All rights reserved.
