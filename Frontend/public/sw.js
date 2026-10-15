@@ -1,7 +1,6 @@
-const CACHE_NAME = 'finsight-ai-v2';
+const CACHE_NAME = 'finsight-ai-v3';
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.webmanifest',
   '/assets/fintech_auth_hero.jpg'
 ];
@@ -10,7 +9,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('[SW] Cache addAll skipped non-critical assets:', err);
+        console.warn('[SW] Pre-caching non-critical assets skipped:', err);
       });
     })
   );
@@ -33,21 +32,50 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Bypass Vite development requests, hot module reload (HMR), WebSocket tokens, and APIs
+  // Bypass APIs, dev resources, and WebSockets
   if (
+    url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/src') ||
     url.pathname.startsWith('/@') ||
-    url.pathname.startsWith('/api') ||
     url.pathname.includes('node_modules') ||
     url.search.includes('t=') ||
-    url.search.includes('token=') ||
     url.protocol.startsWith('ws') ||
     url.hostname === 'localhost' ||
     url.hostname === '127.0.0.1'
   ) {
-    return; // Pass through to local dev server natively
+    return;
   }
 
+  // 1. Navigation / HTML Requests: NETWORK-FIRST STRATEGY
+  // Ensures user always gets the latest index.html with up-to-date JS bundle hashes
+  if (event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          if (cached) return cached;
+          const fallback = await caches.match('/');
+          if (fallback) return fallback;
+          return new Response('Network offline', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain' },
+          });
+        })
+    );
+    return;
+  }
+
+  // 2. Static Assets (JS, CSS, Images, Fonts): Cache-first with network fallback
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -65,16 +93,8 @@ self.addEventListener('fetch', (event) => {
           });
           return networkResponse;
         })
-        .catch(async () => {
-          if (event.request.headers.get('accept')?.includes('text/html')) {
-            const indexCached = await caches.match('/');
-            if (indexCached) return indexCached;
-          }
-          return new Response('Network offline', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: { 'Content-Type': 'text/plain' },
-          });
+        .catch(() => {
+          return new Response('', { status: 404, statusText: 'Not Found' });
         });
     })
   );
